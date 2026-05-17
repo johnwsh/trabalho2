@@ -7,7 +7,7 @@ vector<double> parseCSVRow(const string& row) {
     size_t start = 0;
     bool inQuotes = false;
     
-    for (size_t i = 0; i < row.length(); ++i) {
+    for (size_t i = 3; i < row.length(); ++i) {
         if (!inQuotes && row[i] == ',') {
             string fieldStr = row.substr(start, i - start);
             try {

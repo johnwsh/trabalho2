@@ -2,6 +2,7 @@
 #define TREES_H
 
 #include <vector>
+#include <random>
 
 using namespace std;
 
@@ -9,6 +10,13 @@ enum TreeType {
     CLASSIFICATION,
     REGRESSION
 };
+
+void buildBootstrappedDataset(vector<vector<double>>& X, 
+                                                vector<double>& Y, 
+                                                int numSamples, 
+                                                mt19937 &generator, 
+                                                vector<vector<double>>& newDatasetX, 
+                                                vector<double>& newDatasetY);
 
 struct Node {
     int featureIndex = -1; //índice do dataset que indica sobre qual feature é esse nó
@@ -41,7 +49,6 @@ class Tree {
 
 Node* CART(int maxDepth, 
            int minSamplesSplit, 
-           TreeType type, 
            const vector<vector<double>>& X, 
            const vector<double>& y, 
            int currentDepth = 0);
@@ -50,5 +57,7 @@ Node* CART(int maxDepth,
 Tree* buildTree(int maxDepth, int minSamplesSplit, TreeType type, 
                 const vector<vector<double>>& X, 
                 const vector<double>& y);
+
+double calculateMSE(int attIndex, vector<vector<double>> &X, vector<double> &Y, double &threshold);
 
 #endif
