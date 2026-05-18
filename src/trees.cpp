@@ -133,7 +133,7 @@ Node* CART(int maxDepth,
 Tree* buildTree(int maxDepth, TreeType type, 
                 vector<vector<double>>& X, 
                 vector<double>& y,
-                mt19937 &generator){
+                mt19937 &generator){ 
     
     Tree* tree = new Tree(type);
     int minSamplesSplit;
@@ -144,4 +144,17 @@ Tree* buildTree(int maxDepth, TreeType type,
         minSamplesSplit = 5;
     tree->root = CART (maxDepth, minSamplesSplit, X, y, generator);
     return tree;
+}
+
+double Tree::predict(vector<double>& sample){
+    Node* travellingNode = root;
+    while(!travellingNode->isLeaf){
+        if (sample[travellingNode->featureIndex] < travellingNode->threshold){
+            travellingNode = travellingNode->left;
+        }
+        else {
+            travellingNode = travellingNode->right;
+        }
+    }
+    return travellingNode->value;
 }

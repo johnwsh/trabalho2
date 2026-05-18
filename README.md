@@ -1,1 +1,1 @@
-g++ main.cpp src\trees.cpp src\utils.cpp -o main para buildar
+builda com o makefile

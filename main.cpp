@@ -5,6 +5,7 @@
 
 #include "include/utils.h"
 #include "include/trees.h"
+#include "include/forest.h"
 
 using namespace std;
 
