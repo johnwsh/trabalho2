@@ -69,7 +69,7 @@ Node* CART(int maxDepth,
            vector<vector<double>>& X, 
            vector<double>& y, 
            mt19937 &generator,
-           int currentDepth = 0){
+           int currentDepth){
 
     Node* node = new Node();
     bool isEqual = true;
