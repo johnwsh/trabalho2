@@ -52,6 +52,7 @@ Node* CART(int maxDepth,
            vector<vector<double>>& X, 
            vector<double>& y, 
            mt19937 &generator,
+           TreeType treetype,
            int currentDepth = 0);
 
 //Utilizado para abstração
@@ -61,5 +62,6 @@ Tree* buildTree(int maxDepth, TreeType type,
                 mt19937 &generator);
 
 double calculateMSE(int attIndex, vector<vector<double>> &X, vector<double> &Y, double &threshold, mt19937 &generator);
+double calculateGini(int attIndex, vector<vector<double>> &X, vector<double> &Y, double &threshold, mt19937 &generator);
 
 #endif

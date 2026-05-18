@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <limits.h>
 #include <numeric>
+#include <map>
 
 void buildBootstrappedDataset(vector<vector<double>>& X, 
                                                 vector<double>& Y, 
@@ -10,7 +11,7 @@ void buildBootstrappedDataset(vector<vector<double>>& X,
                                                 vector<vector<double>>& newDatasetX, 
                                                 vector<double>& newDatasetY){
 
-    uniform_int_distribution<int> dist(1, X.size() - 1);
+    uniform_int_distribution<int> dist(0, X.size() - 1);
 
     for (int i = 0; i < numSamples; i++){
         int datasetIndex = dist(generator);
@@ -19,6 +20,66 @@ void buildBootstrappedDataset(vector<vector<double>>& X,
     }
 
 }
+
+double calculateGini(int attIndex, vector<vector<double>> &X, vector<double> &Y, double &threshold, mt19937 &generator){
+    vector<pair<double, double>> attAndY(X.size());
+    
+    map<double, int> rightCounts; 
+    map<double, int> leftCounts;
+
+    for (int i = 0; i < X.size(); i++) {
+        attAndY[i].first = X[i][attIndex];
+        attAndY[i].second = Y[i];
+        
+        //mesma otimização que MSE, só que dessa vez conta quantos aparecem por classe
+        rightCounts[Y[i]]++; 
+    }
+    sort(attAndY.begin(), attAndY.end());
+
+    double gini = INT_MAX;
+    int countRight = X.size();
+    int countLeft = 0;
+
+    for (int i = 0; i < attAndY.size() -1; i++){
+
+        rightCounts[attAndY[i].second]--;
+        leftCounts[attAndY[i].second]++;
+        countLeft++;
+        countRight--;
+
+        if (attAndY[i].first == attAndY[i + 1].first) {
+            continue;
+        }
+
+        double giniLeft = 1.0;
+        map<double, int>::iterator it;
+        for (it = leftCounts.begin(); it != leftCounts.end(); it++) {
+            int contagem = it->second;
+            if (contagem > 0) {
+                double p = (double)contagem / countLeft;
+                giniLeft -= (p * p);
+            }
+        }
+
+        double giniRight = 1.0;
+        for (it = rightCounts.begin(); it != rightCounts.end(); it++) {
+            int contagem = it->second;
+            if (contagem > 0) {
+                double p = (double)contagem / countRight;
+                giniRight -= (p * p);
+            }
+        }
+
+        double weightedGini = ((countLeft * giniLeft) + (countRight * giniRight)) / attAndY.size();
+        if (weightedGini < gini) {
+            gini = weightedGini;
+            threshold = (attAndY[i].first + attAndY[i + 1].first) / 2.0;
+        }
+    }
+
+    return gini;
+}
+
 
 double calculateMSE(int attIndex, vector<vector<double>> &X, vector<double> &Y, double &threshold, mt19937 &generator){
 
@@ -37,11 +98,12 @@ double calculateMSE(int attIndex, vector<vector<double>> &X, vector<double> &Y, 
     double sumRight = sumTotal;
 
     for (int i = 0; i < attAndY.size() -1; i++){
-        if (attAndY[i].first == attAndY[i+1].first) continue;
-        double splitCandidate = (attAndY[i].first + attAndY[i+1].first)/2;
-        
+
         sumLeft += attAndY[i].second;
         sumRight -= attAndY[i].second;
+
+        if (attAndY[i].first == attAndY[i+1].first) continue;
+        double splitCandidate = (attAndY[i].first + attAndY[i+1].first)/2;
 
         double LeftMean = sumLeft/(i+1);
         double RightMean = sumRight/(attAndY.size() - (i + 1));
@@ -69,6 +131,7 @@ Node* CART(int maxDepth,
            vector<vector<double>>& X, 
            vector<double>& y, 
            mt19937 &generator,
+           TreeType treetype,
            int currentDepth){
 
     Node* node = new Node();
@@ -82,7 +145,25 @@ Node* CART(int maxDepth,
 
     if (currentDepth >= maxDepth || X.size() < minSamplesSplit || isEqual){
         node->isLeaf = true;
-        node->value = accumulate(y.begin(),y.end(), 0.0)/y.size();
+        if (treetype == REGRESSION) {
+            node->value = accumulate(y.begin(), y.end(), 0.0) / y.size();
+        } 
+        else { 
+            double winningClass = y[0];
+            int maxVotos = 0;
+            
+            for (int i = 0; i < y.size(); i++) {
+                int votos = 0;
+                for (int j = 0; j < y.size(); j++) {
+                    if (y[j] == y[i]) votos++;
+                }
+                if (votos > maxVotos) {
+                    maxVotos = votos;
+                    winningClass = y[i];
+                }
+            }
+            node->value = winningClass;
+        }
         return node;
     }
 
@@ -91,12 +172,18 @@ Node* CART(int maxDepth,
 
     double threshold;
     double thresholdLocal;
-    int attIndex;
+    int attIndex = -1;
     double error = INT_MAX;
 
     for (int i = 0; i < X[0].size(); i ++){
         if (i != attToRemove){
-            double localError = calculateMSE(i, X, y, thresholdLocal, generator);
+            double localError;
+            
+            if (treetype == REGRESSION)
+                localError = calculateMSE(i, X, y, thresholdLocal, generator);
+            else 
+                localError = calculateGini(i, X, y, thresholdLocal, generator);
+
             if (localError < error){
                 threshold = thresholdLocal;
                 error = localError;
@@ -122,9 +209,9 @@ Node* CART(int maxDepth,
         }
     }
 
-    node->left = CART(maxDepth, minSamplesSplit, X_left, y_left, generator, currentDepth + 1);
+    node->left = CART(maxDepth, minSamplesSplit, X_left, y_left, generator, treetype, currentDepth + 1);
     
-    node->right = CART(maxDepth, minSamplesSplit, X_right, y_right, generator, currentDepth + 1);
+    node->right = CART(maxDepth, minSamplesSplit, X_right, y_right, generator, treetype, currentDepth + 1);
 
     return node;
 }
@@ -142,14 +229,14 @@ Tree* buildTree(int maxDepth, TreeType type,
         minSamplesSplit = 1;
     else 
         minSamplesSplit = 5;
-    tree->root = CART (maxDepth, minSamplesSplit, X, y, generator);
+    tree->root = CART (maxDepth, minSamplesSplit, X, y, generator, type);
     return tree;
 }
 
 double Tree::predict(vector<double>& sample){
     Node* travellingNode = root;
     while(!travellingNode->isLeaf){
-        if (sample[travellingNode->featureIndex] < travellingNode->threshold){
+        if (sample[travellingNode->featureIndex] <= travellingNode->threshold){
             travellingNode = travellingNode->left;
         }
         else {
