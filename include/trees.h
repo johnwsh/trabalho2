@@ -44,20 +44,21 @@ class Tree {
         }
 
         //dado um vetor com features, retorna a predição (Classe ou valor)
-        double predict(const vector<double>& sample);
+        double predict(vector<double>& sample);
 };
 
 Node* CART(int maxDepth, 
            int minSamplesSplit, 
-           const vector<vector<double>>& X, 
-           const vector<double>& y, 
+           vector<vector<double>>& X, 
+           vector<double>& y, 
+           mt19937 &generator,
            int currentDepth = 0);
 
 //Utilizado para abstração
 Tree* buildTree(int maxDepth, int minSamplesSplit, TreeType type, 
-                const vector<vector<double>>& X, 
-                const vector<double>& y);
+                vector<vector<double>>& X, 
+                vector<double>& y);
 
-double calculateMSE(int attIndex, vector<vector<double>> &X, vector<double> &Y, double &threshold);
+double calculateMSE(int attIndex, vector<vector<double>> &X, vector<double> &Y, double &threshold, mt19937 &generator);
 
 #endif

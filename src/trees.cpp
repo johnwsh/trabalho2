@@ -1,6 +1,7 @@
 #include "../include/trees.h"
 #include <algorithm>
 #include <limits.h>
+#include <numeric>
 
 void buildBootstrappedDataset(vector<vector<double>>& X, 
                                                 vector<double>& Y, 
@@ -36,10 +37,11 @@ double calculateMSE(int attIndex, vector<vector<double>> &X, vector<double> &Y, 
     double sumRight = sumTotal;
 
     for (int i = 0; i < attAndY.size() -1; i++){
+        if (attAndY[i].first == attAndY[i+1].first) continue;
         double splitCandidate = (attAndY[i].first + attAndY[i+1].first)/2;
         
-        sumLeft += attAndY[i].first;
-        sumRight -= attAndY[i].first;
+        sumLeft += attAndY[i].second;
+        sumRight -= attAndY[i].second;
 
         double LeftMean = sumLeft/(i+1);
         double RightMean = sumRight/(attAndY.size() - (i + 1));
@@ -64,28 +66,82 @@ double calculateMSE(int attIndex, vector<vector<double>> &X, vector<double> &Y, 
 
 Node* CART(int maxDepth, 
            int minSamplesSplit,
-           const vector<vector<double>>& X, 
-           const vector<double>& y, 
-           int currentDepth = 0, 
-           mt19937 &generator){
+           vector<vector<double>>& X, 
+           vector<double>& y, 
+           mt19937 &generator,
+           int currentDepth = 0){
+
+    Node* node = new Node();
+    bool isEqual = true;
+    for(int i = 0; i < y.size()-1; i++){
+        if (y[i] != y[i+1]){
+            isEqual = false;
+            break;
+        }
+    }
+
+    if (currentDepth >= maxDepth || X.size() < minSamplesSplit || isEqual){
+        node->isLeaf = true;
+        node->value = accumulate(y.begin(),y.end(), 0.0)/y.size();
+        return node;
+    }
 
     uniform_int_distribution<int> dist(0,X[0].size()-1);
     int attToRemove = dist(generator);
 
+    double threshold;
+    double thresholdLocal;
+    int attIndex;
+    double error = INT_MAX;
+
     for (int i = 0; i < X[0].size(); i ++){
         if (i != attToRemove){
-            
+            double localError = calculateMSE(i, X, y, thresholdLocal, generator);
+            if (localError < error){
+                threshold = thresholdLocal;
+                error = localError;
+                attIndex = i;
+            }
         }
     }
+
+    node->featureIndex = attIndex;
+    node->threshold = threshold;
+    node->isLeaf = false;
+
+    vector<vector<double>> X_left, X_right;
+    vector<double> y_left, y_right;
+
+    for (int i = 0; i < X.size(); i++) {
+        if (X[i][attIndex] <= threshold) {
+            X_left.push_back(X[i]);
+            y_left.push_back(y[i]);
+        } else {
+            X_right.push_back(X[i]);
+            y_right.push_back(y[i]);
+        }
+    }
+
+    node->left = CART(maxDepth, minSamplesSplit, X_left, y_left, generator, currentDepth + 1);
+    
+    node->right = CART(maxDepth, minSamplesSplit, X_right, y_right, generator, currentDepth + 1);
+
+    return node;
 }
 
 //Utilizado para abstração
-Tree* buildTree(int maxDepth, int minSamplesSplit, TreeType type, 
-                const vector<vector<double>>& X, 
-                const vector<double>& y,
+Tree* buildTree(int maxDepth, TreeType type, 
+                vector<vector<double>>& X, 
+                vector<double>& y,
                 mt19937 &generator){
     
     Tree* tree = new Tree(type);
-    tree->root = CART (maxDepth, minSamplesSplit, X, y, 0, generator);
+    int minSamplesSplit;
+
+    if (type == CLASSIFICATION)
+        minSamplesSplit = 1;
+    else 
+        minSamplesSplit = 5;
+    tree->root = CART (maxDepth, minSamplesSplit, X, y, generator);
     return tree;
 }
