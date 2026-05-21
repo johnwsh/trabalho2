@@ -13,9 +13,9 @@
 
 using namespace std;
 
-vector<double> parseCSVRow(const string& row);
-vector<vector<double>> readCSV(const string& filename);
-void splitDataset(  const vector<vector<double>>& dataset, 
+vector<double> parseCSVRow(string& row);
+vector<vector<double>> readCSV(string& filename);
+void splitDataset(  vector<vector<double>>& dataset, 
                     int gravityIndex,
                     int classIndex, 
                     vector<vector<double>>& X, 

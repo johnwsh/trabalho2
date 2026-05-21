@@ -1,6 +1,6 @@
 #include "../include/utils.h"
 
-vector<double> parseCSVRow(const string& row) {
+vector<double> parseCSVRow(string& row) {
     vector<double> fields;
     stringstream ss(row);
     string field;
@@ -17,7 +17,7 @@ vector<double> parseCSVRow(const string& row) {
     return fields;
 }
 
-vector<vector<double>> readCSV(const string& filename) {
+vector<vector<double>> readCSV(string& filename) {
     vector<vector<double>> data;
     ifstream file(filename);
     
@@ -37,14 +37,14 @@ vector<vector<double>> readCSV(const string& filename) {
 }
 
 //Para separar em dados e prediction
-void splitDataset(  const vector<vector<double>>& dataset, 
+void splitDataset(  vector<vector<double>>& dataset, 
                     int gravityIndex,
                     int classIndex, 
                     vector<vector<double>>& X, 
                     vector<double>& Y,
                     vector<int>& Z) {
     
-    for (const auto& row : dataset) {
+    for (auto& row : dataset) {
         vector<double> features;
         
         for (int i = 3; i < row.size(); i++) {

@@ -1,4 +1,4 @@
-#include "neuron.h"
+#include "../include/neuron.h"
 #include <math.h>
 
 Neuron::Neuron(int numInputs, mt19937& generator) {
@@ -14,7 +14,7 @@ Neuron::Neuron(int numInputs, mt19937& generator) {
     }
 }
 
-void Neuron::activate(const vector<double> &features, bool useActivationFunction){
+void Neuron::activate(vector<double> &features, bool useActivationFunction){
     double u = this->bias; 
     
     for (int i = 0; i < features.size(); i++) {
@@ -26,7 +26,7 @@ void Neuron::activate(const vector<double> &features, bool useActivationFunction
         this->output = u;
 }
 
-void Neuron::updateWeights(const vector<double>& inputs, double learningRate, double momentumFactor) {
+void Neuron::updateWeights(vector<double>& inputs, double learningRate, double momentumFactor) {
     
     for (int i = 0; i < this->weights.size(); i++) {
         this->momentum[i] = (momentumFactor * this->momentum[i]) + (learningRate * this->delta * inputs[i]);

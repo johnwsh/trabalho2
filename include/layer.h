@@ -24,7 +24,7 @@ class Layer{
         LayerType type;
 
         Layer(int numNeurons, int numInputsPerNeuron, LayerType type, mt19937& generator);
-        void forward(const vector<double>& inputs, NetType type);
+        void forward(vector<double>& inputs, NetType type);
 };
 
 #endif

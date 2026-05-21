@@ -1,4 +1,4 @@
-#include "network.h"
+#include "../include/network.h"
 #include <cmath>
 #include <iostream>
 
@@ -21,7 +21,7 @@ Network::Network(vector<int> topology, mt19937& generator, NetType type) {
     this->layers.push_back(Layer(numOutputNeurons, numOutputInputs, OUTPUT, generator));
 }
 
-void Network::predict(const vector<double>& sample) {
+void Network::predict(vector<double>& sample) {
     this->layers[0].forward(sample, this->type);
 
     for (int i = 1; i < this->layers.size(); i++) {
@@ -31,7 +31,7 @@ void Network::predict(const vector<double>& sample) {
     this->output = this->layers.back().output;
 }
 
-void Network::computeErrors(const vector<double>& expectedOutput) {
+void Network::computeErrors(vector<double>& expectedOutput) {
 
     Layer& outputLayer = this->layers.back(); 
     
@@ -82,7 +82,7 @@ void Network::updateWeights(double learningRate, double momentumFactor) {
     }
 }
 
-void Network::train(const vector<vector<double>>& X, const vector<vector<double>>& Y, double learningRate, double momentumFactor, int maxEpochs, double minError) {
+void Network::train(vector<vector<double>>& X, vector<vector<double>>& Y, double learningRate, double momentumFactor, int maxEpochs, double minError) {
     
     double erroAnterior = 999999.0; 
     double erroAtual = 0.0;
@@ -112,7 +112,7 @@ void Network::train(const vector<vector<double>>& X, const vector<vector<double>
             cout << "Epoca: " << epoca << " | Erro Atual: " << erroAtual << endl;
         }
 
-        if (abs(erroAnterior - erroAtual) <= minError) {
+        if (fabs(erroAnterior - erroAtual) <= minError) {
             break; 
         }
 
@@ -121,7 +121,7 @@ void Network::train(const vector<vector<double>>& X, const vector<vector<double>
     }
 }
 
-vector<vector<double>> oneHotEncode(const vector<double>& labels, int numClasses) {
+vector<vector<double>> oneHotEncode(vector<double>& labels, int numClasses) {
     //Para transformar uma saida de uma classe em um vetor tipo {0,0,1,0}
     vector<vector<double>> encodedMatrix;
 
@@ -139,7 +139,7 @@ vector<vector<double>> oneHotEncode(const vector<double>& labels, int numClasses
     return encodedMatrix;
 }
 
-vector<vector<double>> normalize(const vector<vector<double>>& X, vector<double>& minVals, vector<double>& maxVals) {
+vector<vector<double>> normalize(vector<vector<double>>& X, vector<double>& minVals, vector<double>& maxVals) {
     
     if (X.empty() || X[0].empty()) return X; 
 
@@ -169,5 +169,24 @@ vector<vector<double>> normalize(const vector<vector<double>>& X, vector<double>
         }
     }
 
+    return X_normalizado;
+}
+
+vector<vector<double>> applyNormalization(const vector<vector<double>>& X_test, const vector<double>& minVals, const vector<double>& maxVals) {
+    
+    if (X_test.empty() || X_test[0].empty()) return X_test;
+
+    vector<vector<double>> X_normalizado = X_test; 
+
+    for (int i = 0; i < X_test.size(); i++) {
+        for (int j = 0; j < X_test[0].size(); j++) {
+            if (maxVals[j] == minVals[j]) {
+                X_normalizado[i][j] = 0.0; 
+            } else {
+                // Apenas aplica a matemática direta
+                X_normalizado[i][j] = (X_test[i][j] - minVals[j]) / (maxVals[j] - minVals[j]);
+            }
+        }
+    }
     return X_normalizado;
 }

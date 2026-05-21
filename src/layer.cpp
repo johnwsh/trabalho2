@@ -1,4 +1,4 @@
-#include "layer.h"
+#include "../include/layer.h"
 
 Layer::Layer(int numNeurons, int numInputsPerNeuron, LayerType type, mt19937& generator) {
     this->numNeurons = numNeurons;
@@ -9,7 +9,7 @@ Layer::Layer(int numNeurons, int numInputsPerNeuron, LayerType type, mt19937& ge
     }
 }
 
-void Layer::forward(const vector<double>& inputs, NetType type) {
+void Layer::forward(vector<double>& inputs, NetType type) {
     this->output.clear(); 
 
     if (this->type == INPUT) {
