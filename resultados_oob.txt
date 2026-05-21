@@ -1,0 +1,38 @@
+RESULTADOS OUT-OF-BAG:
+NUM_TREES: 100, TREE_DEPTH: 10, TRAIN_PERCENT: 0.8
+
+Métricas de Regressão:
+RMSE: 0.816259
+MAE: 0.512691
+R2: 0.997552
+Métricas de Classificação:
+Accuracy: 0.970833
+
+Classe 1
+Precision: 1
+Recall: 0.935829
+F1-score: 0.966851
+
+Classe 2
+Precision: 0.971599
+Recall: 0.980392
+F1-score: 0.975976
+
+Classe 3
+Precision: 0.954819
+Recall: 0.975385
+F1-score: 0.964992
+
+Classe 4
+Precision: 0.958333
+Recall: 0.92
+F1-score: 0.938776
+
+Confusion Matrix
+
+          Predito
+        1    2    3    4
+Real 1   175    12    0    0    
+Real 2   0    650    13    0    
+Real 3   0    7    317    1    
+Real 4   0    0    2    23    

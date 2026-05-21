@@ -18,38 +18,13 @@ Forest::Forest(int numTrees, TreeType type, vector<vector<double>> &X, vector<do
 #include <map>
 
 double Forest::predict(vector<double>& sample, int sampleIndex){
-    if (this->type == REGRESSION) {
-        double sumPredict = 0;
-        int usedTrees = 0;
-        for (int i = 0; i < forest.size(); i++){
-            if(forest[i]->usedSamples[sampleIndex]) {
-                sumPredict += forest[i]->predict(sample);
-                usedTrees++;
-            }
+    double sumPredict = 0;
+    int usedTrees = 0;
+    for (int i = 0; i < forest.size(); i++){
+        if(forest[i]->usedSamples[sampleIndex]) {
+            sumPredict += forest[i]->predict(sample);
+            usedTrees++;
         }
-        return sumPredict / usedTrees;
-    } 
-    else { 
-
-        vector<double> predictions;
-        for (int i = 0; i < forest.size(); i++) {
-            predictions.push_back(forest[i]->predict(sample));
-        }
-
-        double winningClass = predictions[0];
-        int maxVotos = 0;
-        
-        for (int i = 0; i < predictions.size(); i++) {
-            int votos = 0;
-            for (int j = 0; j < predictions.size(); j++) {
-                if (predictions[j] == predictions[i]) votos++;
-            }
-            if (votos > maxVotos) {
-                maxVotos = votos;
-                winningClass = predictions[i];
-            }
-        }
-        
-        return winningClass;
     }
+    return sumPredict / usedTrees; 
 }

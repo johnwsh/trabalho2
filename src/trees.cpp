@@ -4,13 +4,13 @@
 #include <numeric>
 #include <map>
 
-void buildBootstrappedDataset(vector<vector<double>>& X, 
-                                                vector<double>& Y, 
-                                                int numSamples, 
-                                                mt19937 &generator, 
-                                                vector<vector<double>>& newDatasetX, 
-                                                vector<double>& newDatasetY,
-                                                vector<bool>& usedSamples){
+void buildBootstrappedDataset(  vector<vector<double>>& X, 
+                                vector<double>& Y, 
+                                int numSamples, 
+                                mt19937 &generator, 
+                                vector<vector<double>>& newDatasetX, 
+                                vector<double>& newDatasetY,
+                                vector<bool>& usedSamples){
 
     uniform_int_distribution<int> dist(0, X.size() - 1);
 

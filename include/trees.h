@@ -11,13 +11,13 @@ enum TreeType {
     REGRESSION
 };
 
-void buildBootstrappedDataset(vector<vector<double>>& X, 
-                                                vector<double>& Y, 
-                                                int numSamples, 
-                                                mt19937 &generator, 
-                                                vector<vector<double>>& newDatasetX, 
-                                                vector<double>& newDatasetY,
-                                                vector<bool>& usedSamples);
+void buildBootstrappedDataset(  vector<vector<double>>& X, 
+                                vector<double>& Y, 
+                                int numSamples, 
+                                mt19937 &generator, 
+                                vector<vector<double>>& newDatasetX, 
+                                vector<double>& newDatasetY,
+                                vector<bool>& usedSamples);
 
 struct Node {
     int featureIndex = -1; //índice do dataset que indica sobre qual feature é esse nó
