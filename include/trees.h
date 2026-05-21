@@ -16,7 +16,8 @@ void buildBootstrappedDataset(vector<vector<double>>& X,
                                                 int numSamples, 
                                                 mt19937 &generator, 
                                                 vector<vector<double>>& newDatasetX, 
-                                                vector<double>& newDatasetY);
+                                                vector<double>& newDatasetY,
+                                                vector<bool>& usedSamples);
 
 struct Node {
     int featureIndex = -1; //índice do dataset que indica sobre qual feature é esse nó
@@ -36,6 +37,7 @@ class Tree {
     public:
         TreeType type;
         Node* root;
+        vector<bool> usedSamples;
 
         Tree(TreeType t) : type(t), root(nullptr) {}
 
@@ -59,6 +61,7 @@ Node* CART(int maxDepth,
 Tree* buildTree(int maxDepth, TreeType type, 
                 vector<vector<double>>& X, 
                 vector<double>& y,
+                vector<bool>& usedSamples,
                 mt19937 &generator);
 
 double calculateMSE(int attIndex, vector<vector<double>> &X, vector<double> &Y, double &threshold, mt19937 &generator);

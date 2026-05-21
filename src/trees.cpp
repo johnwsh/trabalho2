@@ -9,7 +9,8 @@ void buildBootstrappedDataset(vector<vector<double>>& X,
                                                 int numSamples, 
                                                 mt19937 &generator, 
                                                 vector<vector<double>>& newDatasetX, 
-                                                vector<double>& newDatasetY){
+                                                vector<double>& newDatasetY,
+                                                vector<bool>& usedSamples){
 
     uniform_int_distribution<int> dist(0, X.size() - 1);
 
@@ -17,6 +18,7 @@ void buildBootstrappedDataset(vector<vector<double>>& X,
         int datasetIndex = dist(generator);
         newDatasetX.push_back(X[datasetIndex]);
         newDatasetY.push_back(Y[datasetIndex]);
+        usedSamples[datasetIndex] = true;
     }
 
 }
@@ -220,9 +222,12 @@ Node* CART(int maxDepth,
 Tree* buildTree(int maxDepth, TreeType type, 
                 vector<vector<double>>& X, 
                 vector<double>& y,
+                vector<bool>& usedSamples,
                 mt19937 &generator){ 
     
     Tree* tree = new Tree(type);
+    tree->usedSamples = usedSamples;
+
     int minSamplesSplit;
 
     if (type == CLASSIFICATION)

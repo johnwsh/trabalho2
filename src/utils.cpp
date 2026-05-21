@@ -4,32 +4,18 @@ using namespace std;
 
 vector<double> parseCSVRow(const string& row) {
     vector<double> fields;
-    size_t start = 0;
-    bool inQuotes = false;
-    
-    for (size_t i = 3; i < row.length(); ++i) {
-        if (!inQuotes && row[i] == ',') {
-            string fieldStr = row.substr(start, i - start);
-            try {
-                fields.push_back(stod(fieldStr)); 
-            } catch (const invalid_argument& e) {
-                fields.push_back(0.0); 
-            }
-            start = i + 1;
-        } else if (row[i] == '"') {
-            inQuotes = !inQuotes;
+    stringstream ss(row);
+    string field;
+
+    while (getline(ss, field, ',')) {
+        try {
+            fields.push_back(stod(field));
+        }
+        catch (...) {
+            fields.push_back(0.0);
         }
     }
-    
-    string lastField = row.substr(start);
-    try {
-        if (!lastField.empty()) {
-            fields.push_back(stod(lastField));
-        }
-    } catch (const invalid_argument& e) {
-        fields.push_back(0.0);
-    }
-    
+
     return fields;
 }
 
@@ -61,7 +47,7 @@ void splitDataset(const vector<vector<double>>& dataset, int predictionIndex, ve
     for (const auto& row : dataset) {
         vector<double> features;
         
-        for (int i = 0; i < row.size(); i++) {
+        for (int i = 3; i < row.size(); i++) {
             if (i == predictionIndex) {
                 y.push_back(row[i]);
             } else {
