@@ -1,0 +1,15 @@
+metric,class,value
+RMSE,all,2.58473
+Accuracy,all,76.0667
+Precision,1,0.847222
+Recall,1,0.521368
+F1-Measure,1,0.645503
+Precision,2,0.768085
+Recall,2,0.867788
+F1-Measure,2,0.814898
+Precision,3,0.713942
+Recall,3,0.735149
+F1-Measure,3,0.72439
+Precision,4,0
+Recall,4,0
+F1-Measure,4,0

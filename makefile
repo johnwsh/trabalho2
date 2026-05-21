@@ -1,22 +1,37 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Iinclude -g
-TARGET = floresta.exe
 OBJ_DIR = obj
 
-SRCS = main.cpp src/utils.cpp src/trees.cpp src/forest.cpp src/neuron.cpp src/layer.cpp src/network.cpp 
+TARGET_REDE = main_rede.exe
+TARGET_FOREST = main_forest.exe
 
-OBJS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(notdir $(SRCS)))
+CORE_SRCS = src/utils.cpp src/trees.cpp src/forest.cpp src/neuron.cpp src/layer.cpp src/network.cpp 
+CORE_OBJS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(notdir $(CORE_SRCS)))
 
-vpath %.cpp src
+vpath %.cpp src .
 
-all: $(TARGET)
+all: main_rede main_forest
 
-$(TARGET): $(OBJS)
-	@$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
+$(OBJ_DIR):
+	@mkdir -p $(OBJ_DIR)
 
-# Regra para compilar os .o
-$(OBJ_DIR)/%.o: %.cpp
+main_rede: $(OBJ_DIR) $(TARGET_REDE)
+	@echo "[+] Rede Neural compilada com sucesso: $(TARGET_REDE)"
+
+main_forest: $(OBJ_DIR) $(TARGET_FOREST)
+	@echo "[+] Random Forest compilada com sucesso: $(TARGET_FOREST)"
+
+$(TARGET_REDE): $(CORE_OBJS) $(OBJ_DIR)/main_rede.o
+	@$(CXX) $(CXXFLAGS) -o $@ $^
+
+$(TARGET_FOREST): $(CORE_OBJS) $(OBJ_DIR)/main_forest.o
+	@$(CXX) $(CXXFLAGS) -o $@ $^
+
+
+$(OBJ_DIR)/%.o: %.cpp | $(OBJ_DIR)
+	@echo "Compilando $<..."
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	@rm -rf $(OBJ_DIR) $(TARGET)
+	@echo "Limpando o projeto..."
+	@rm -rf $(OBJ_DIR) $(TARGET_REDE) $(TARGET_FOREST)

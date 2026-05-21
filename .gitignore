@@ -1,3 +1,4 @@
-floresta.exe
 obj/
-main.cpp
+.venv/
+main_forest.exe
+main_rede.exe

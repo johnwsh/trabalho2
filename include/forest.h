@@ -16,7 +16,7 @@ class Forest {
                 delete forest[i];
             }
         }
-        double predict(vector<double>& sample, int sampleIndex);
+        double predict(vector<double>& sample, int sampleIndex = -1);
 };
 
 
