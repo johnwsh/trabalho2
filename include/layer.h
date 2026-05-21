@@ -3,7 +3,6 @@
 
 #include <vector>
 #include "neuron.h"
-#include "network.h"
 
 using namespace std;
 

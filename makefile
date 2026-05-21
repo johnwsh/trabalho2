@@ -1,9 +1,9 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -std=c++17 -Iinclude -g
+CXXFLAGS = -std=c++17 -Iinclude -g
 TARGET = floresta.exe
 OBJ_DIR = obj
 
-SRCS = main.cpp src/utils.cpp src/trees.cpp src/forest.cpp
+SRCS = main.cpp src/utils.cpp src/trees.cpp src/forest.cpp src/neuron.cpp src/layer.cpp src/network.cpp 
 
 OBJS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(notdir $(SRCS)))
 
