@@ -14,6 +14,7 @@ class Network{
 
         Network(vector<int> topology, mt19937& generator, NetType type); 
         void predict(const vector<double>& sample);
+        void computeErrors(const vector<double>& expectedOutput);
 
 };
 

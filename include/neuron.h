@@ -13,6 +13,7 @@ class Neuron{
         vector<double> momentum;
         double output;
         int numInputs;
+        double delta;
     
         void activate(const vector<double> &features, bool useActivationFunction);
         Neuron(int numInput, mt19937& generator);
