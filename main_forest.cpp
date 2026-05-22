@@ -15,7 +15,7 @@
 using namespace std;
 
 // ==========================================
-// PAINEL DE CONTROLE DA RANDOM FOREST
+// PARAMETROS
 // ==========================================
 #define K_FOLDS 5
 #define NUM_TREES 100
@@ -33,10 +33,8 @@ int main(){
 
     splitDataset(dataset, 6, 7, X, Y, Z);
 
-    // O construtor da Forest exige vector<double>, então convertemos o Z
     vector<double> Z_double(Z.begin(), Z.end());
 
-    // Embaralha o dataset completo
     vector<int> indices(X.size());
     for (int i = 0; i < indices.size(); i++){
         indices[i] = i;
@@ -51,15 +49,14 @@ int main(){
     
     int foldSize = X.size() / K_FOLDS;
     
-    // Acumuladores de métricas
     double soma_rmse_regressao = 0.0;
     double soma_acuracia_classificacao = 0.0;
     vector<vector<int>> matriz_confusao_global(4, vector<int>(4, 0));
 
     for (int k = 0; k < K_FOLDS; k++) {
         vector<vector<double>> X_fold_treino, X_fold_val;
-        vector<double> Y_fold_treino, Y_fold_val; // Para Regressão
-        vector<double> Z_fold_treino, Z_fold_val; // Para Classificação
+        vector<double> Y_fold_treino, Y_fold_val; 
+        vector<double> Z_fold_treino, Z_fold_val; 
 
         int testStart = k * foldSize;
         int testEnd = (k == K_FOLDS - 1) ? X.size() : (k + 1) * foldSize;
@@ -92,12 +89,10 @@ int main(){
         for (int i = 0; i < X_fold_val.size(); i++) {
             
             // --- 1. AVALIANDO A FLORESTA DE REGRESSÃO ---
-            // A classe já sabe que tem que fazer a média e devolver a gravidade!
             double grav_prevista = regForest.predict(X_fold_val[i]);
             soma_erro_quad_fold += pow(grav_prevista - Y_fold_val[i], 2);
 
             // --- 2. AVALIANDO A FLORESTA DE CLASSIFICAÇÃO ---
-            // A classe já sabe que tem que fazer a votação e devolver o vencedor!
             int class_prevista = classForest.predict(X_fold_val[i]);
             int class_real = round(Z_fold_val[i]);
 
@@ -115,9 +110,6 @@ int main(){
         soma_acuracia_classificacao += acc_fold;
     }
 
-    // =========================================================================
-    // EXPORTAÇÃO
-    // =========================================================================
     double media_rmse = soma_rmse_regressao / K_FOLDS;
     double media_acc = soma_acuracia_classificacao / K_FOLDS;
 

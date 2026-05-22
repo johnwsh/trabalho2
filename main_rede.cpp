@@ -14,7 +14,7 @@
 using namespace std;
 
 // ==========================================
-// PAINEL DE CONTROLE DA REDE NEURAL
+// PARAMETROS
 // ==========================================
 #define K_FOLDS 5
 #define LEARNING_RATE 0.001
@@ -34,10 +34,8 @@ int main(){
 
     splitDataset(dataset, 6, 7, X, Y, Z);
 
-    // Converte o Z (int) para double para usar no oneHotEncode
     vector<double> Z_double(Z.begin(), Z.end());
 
-    // Embaralha o dataset completo
     vector<int> indices(X.size());
     for (int i = 0; i < indices.size(); i++){
         indices[i] = i;
@@ -59,8 +57,8 @@ int main(){
 
     for (int k = 0; k < K_FOLDS; k++) {
         vector<vector<double>> X_fold_treino, X_fold_val;
-        vector<double> Y_fold_treino, Y_fold_val; // Para Regressão
-        vector<double> Z_fold_treino, Z_fold_val; // Para Classificação
+        vector<double> Y_fold_treino, Y_fold_val; 
+        vector<double> Z_fold_treino, Z_fold_val; 
 
         int testStart = k * foldSize;
         int testEnd = (k == K_FOLDS - 1) ? X.size() : (k + 1) * foldSize;
@@ -85,22 +83,19 @@ int main(){
         vector<vector<double>> X_fold_treino_norm = normalize(X_fold_treino, min_fold, max_fold);
         vector<vector<double>> X_fold_val_norm = applyNormalization(X_fold_val, min_fold, max_fold);
 
-        // 1. Envelopa os targets da Regressão
         vector<vector<double>> Y_fold_treino_env;
         for (double y : Y_fold_treino) Y_fold_treino_env.push_back({y});
 
-        // 2. Transforma os targets da Classificação em One-Hot (Ex: Classe 2 vira {0, 1, 0, 0})
         vector<vector<double>> Z_fold_treino_encoded = oneHotEncode(Z_fold_treino, 4);
 
 
         // =======================================================
         // TREINAMENTO DOS DOIS MODELOS SEPARADOS
         // =======================================================
-        // Rede de Regressão: 3 entradas, 8 ocultos, 1 saída contínua
+       
         Network regNet({3, 16, 16, 1}, generator, REGRESSION);
         regNet.train(X_fold_treino_norm, Y_fold_treino_env, LEARNING_RATE, MOMENTUM_FACTOR, MAX_EPOCHS, MIN_ERROR);
 
-        // Rede de Classificação: 3 entradas, 8 ocultos, 4 saídas de probabilidade
         Network classNet({3, 16, 16, 4}, generator, CLASSIFICATION);
         classNet.train(X_fold_treino_norm, Z_fold_treino_encoded, LEARNING_RATE, MOMENTUM_FACTOR, MAX_EPOCHS, MIN_ERROR);
 
@@ -127,7 +122,7 @@ int main(){
             for (int c = 1; c < 4; c++) {
                 if (classNet.output[c] > maior_probabilidade) {
                     maior_probabilidade = classNet.output[c];
-                    class_prevista = c + 1; // Ajusta o índice (0-3) para a classe (1-4)
+                    class_prevista = c + 1; 
                 }
             }
 
@@ -135,7 +130,6 @@ int main(){
 
             if (class_prevista == class_real) acertos_fold++;
             
-            // Popula a matriz global baseada na Rede de Classificação
             matriz_confusao_global[class_real - 1][class_prevista - 1]++;
         }
 
@@ -148,9 +142,6 @@ int main(){
         soma_acuracia_classificacao += acc_fold;
     }
 
-    // =========================================================================
-    // EXPORTAÇÃO
-    // =========================================================================
     double media_rmse = soma_rmse_regressao / K_FOLDS;
     double media_acc = soma_acuracia_classificacao / K_FOLDS;
 
@@ -183,6 +174,5 @@ int main(){
     }
     outMetrics.close();
 
-    cout << "Sucesso! Pode executar o script Python da Rede Neural." << endl;
     return 0;
 }

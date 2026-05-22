@@ -13,7 +13,7 @@ def plot_forest_performance():
 
     plt.rcParams['font.family'] = 'sans-serif'
     fig = plt.figure(figsize=(15, 11))
-    fig.suptitle('Dashboard: Random Forest (Regressão vs Classificação)', fontsize=18, fontweight='bold', color='#2c3e50')
+    fig.suptitle('Random Forest - CART', fontsize=18, fontweight='bold', color='#2c3e50')
 
     # PLOT 1: Heatmap
     ax1 = fig.add_subplot(2, 2, 1)
@@ -34,8 +34,8 @@ def plot_forest_performance():
             ax1.text(j, i, int(cm[i, j]), ha="center", va="center",
                      color="white" if cm[i, j] > thresh else "black", fontweight='bold', fontsize=12)
                      
-    ax1.set_ylabel('Classe Real (Gabarito)', fontsize=11, fontweight='bold')
-    ax1.set_xlabel('Classe Prevista pela Votação', fontsize=11, fontweight='bold')
+    ax1.set_ylabel('Classe Real', fontsize=11, fontweight='bold')
+    ax1.set_xlabel('Classe Prevista', fontsize=11, fontweight='bold')
 
     # PLOT 2: Barras
     ax2 = fig.add_subplot(2, 2, 2)
